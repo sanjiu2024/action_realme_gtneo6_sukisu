@@ -9,7 +9,7 @@ env:
   FEIL: 'realme_gt_neo6_sukisu'
   CPUD: 'pineapple'
   ANDROID_VERSION: 'android14'
-  KERNEL_VERSION: '6.1.118'
+  KERNEL_VERSION: '6.1'
   KERNEL_NAME: '-android14-sukiSU-Ultra吊炸天GKI内核'
   KERNELSU_VARIANT: SukiSU-Ultra
   KERNELSU_VERSION: main
