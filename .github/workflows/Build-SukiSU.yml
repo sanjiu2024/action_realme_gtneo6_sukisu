@@ -133,9 +133,9 @@ jobs:
         if: ${{ env.VFS_patch_ENABLED == 'enable' }}
         run: |
           cd kernel_workspace/kernel_platform/common
-          cp ../../SukiSU_patch/hooks/syscall_hooks.patch ./
+          cp ../../SukiSU_patch/hooks/scope_min_manual_hooks_v1.6.patch ./
           echo "正在打vfs补丁"
-          patch -p1 -F 3 < syscall_hooks.patch
+          patch -p1 -F 3 < scope_min_manual_hooks_v1.6.patch
           echo "完成"
 
           #  cp ../../SukiSU_patch/other/lz4k_patch/${{ env.KERNEL_VERSION }}/lz4kd.patch ./
