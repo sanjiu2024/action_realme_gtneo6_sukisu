@@ -11,7 +11,6 @@ env:
   ANDROID_VERSION: 'android14'
   KERNEL_VERSION: '6.1'
   KERNEL_NAME: '-android14-SukiSU-bale'
-  KERNELSU_VARIANT: SukiSU-Ultra
   KERNELSU_VERSION: main
   SUSFS_ENABLED: true
   VFS_patch_ENABLED: enable
@@ -62,41 +61,17 @@ jobs:
          sed -i 's/ -dirty//g' kernel_platform/common/scripts/setlocalversion
          sed -i 's/ -dirty//g' kernel_platform/msm-kernel/scripts/setlocalversion
          sed -i 's/ -dirty//g' kernel_platform/external/dtc/scripts/setlocalversion
-      
-      - name: SukiSU-Ultra & SukiSU version
-        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' || env.KERNELSU_VARIANT == 'SukiSU' }}
-        run: |
-          if [[ "${{ env.KERNELSU_VERSION }}" == "tag" ]]; then
-            echo "BRANCH=-" >> $GITHUB_ENV
-          elif [[ "${{ env.KERNELSU_VERSION }}" == "main" ]]; then
-            echo "BRANCH=-s susfs-main" >> $GITHUB_ENV
-          fi
           
       - name: Add SukiSU-Ultra
-        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' }}
-        id: ksu_version_suu
         run: |
           cd kernel_workspace/kernel_platform
-          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
+          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU-Ultra/main/kernel/setup.sh" | bash -s builtin
           cd ./KernelSU
           KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 37185)
           echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
           echo "ksuuver=$KSU_VERSION" >> $GITHUB_OUTPUT
           export KSU_VERSION=$KSU_VERSION
           sed -i "s/DKSU_VERSION=12800/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
-
-      - name: Add SukiSU
-        if: ${{ env.KERNELSU_VARIANT == 'SukiSU' }}
-        id: ksu_version_su
-        run: |
-          cd kernel_workspace/kernel_platform
-          curl -LSs "https://raw.githubusercontent.com/ShirkNeko/KernelSU/main/kernel/setup.sh" | bash ${{ env.BRANCH }}
-          cd ./KernelSU
-          KSU_VERSION=$(expr $(/usr/bin/git rev-list --count main) "+" 10606)
-          echo "KSUVER=$KSU_VERSION" >> $GITHUB_ENV
-          echo "ksuver=$KSU_VERSION" >> $GITHUB_OUTPUT
-          export KSU_VERSION=$KSU_VERSION
-          sed -i "s/DKSU_VERSION=16/DKSU_VERSION=${KSU_VERSION}/" kernel/Makefile
           
       - name: Apply SUSFS Patches SukiSU
         if: ${{ env.SUSFS_ENABLED == 'true' }}
@@ -208,7 +183,6 @@ jobs:
           fi
 
       - name: Apply patch_linux and replace Image
-        if: ${{ env.KERNELSU_VARIANT == 'SukiSU-Ultra' }}
         run: |
           cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           curl -LSs "https://raw.githubusercontent.com/ShirkNeko/SukiSU_patch/refs/heads/main/kpm/patch_linux" -o patch_linux
@@ -216,13 +190,6 @@ jobs:
           ./patch_linux
           rm -f Image
           mv oImage Image
-          cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
-          cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
-
-      - name: Reproduction of documents
-        if: ${{ env.KERNELSU_VARIANT == 'SukiSU' }}
-        run: |
-          cd kernel_workspace/kernel_platform/out/msm-kernel-${{ env.CPUD }}-gki/dist
           cp Image $GITHUB_WORKSPACE/AnyKernel3/Image
           cp Image $GITHUB_WORKSPACE/kernel_workspace/kernel
          
