@@ -83,6 +83,11 @@ jobs:
           rm kernel_platform/msm-kernel/android/abi_gki_protected_exports_* || true
           sed -i 's/ -dirty//g' kernel_platform/{common,msm-kernel}/scripts/setlocalversion
 
+      - name: Debug Directory Structure
+        run: |
+          ls -lR kernel_workspace
+          echo "当前路径：$(pwd)"
+          
       - name: Setup SukiSU Ultra
         run: |
           cd kernel_workspace/kernel_platform
